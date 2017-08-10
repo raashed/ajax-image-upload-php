@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax Image Upload PHP</title>
+</head>
+<body>
+<form id="form">
+    <input type="file" name="file" id="file">
+    <input type="submit" value="Upload">
+</form>
+<div id="status"></div>
+
+<script src="jquery-3.2.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var form_id = $("#form");
+
+        form_id.submit(function (event) {
+            event.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                url: "action.php",
+                data: new FormData(document.getElementById("form")),
+                dataType: 'JSON',
+                contentType: false,
+                cache: false,
+                processData: false,
+                beforeSend: function () {
+                    $("#status").text('Loading...');
+                },
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (event) {
+                        var percent_complete = event.loaded / event.total;
+                        percent_complete = parseInt(percent_complete * 100);
+                        $('#status').text(percent_complete + '%');
+                    }, false);
+                    return xhr;
+                },
+                success: function (response) {
+                    $("#status").text(response);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
